@@ -1,0 +1,25 @@
+name: Validate runbook
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Download repository files
+        uses: actions/checkout@v4
+
+      - name: Check that README exists
+        run: test -f README.md
+
+      - name: Confirm approval step is documented
+        run: grep -i "approval" README.md
