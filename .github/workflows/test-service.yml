@@ -28,6 +28,7 @@ jobs:
         run: python -m unittest -v test_app
   deploy:
     needs: test
+    environment: training-production
     runs-on: ubuntu-latest
 
     steps:
