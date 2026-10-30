@@ -7,7 +7,7 @@ class StatusService(BaseHTTPRequestHandler):
         if self.path == "/health":
             status = 200
             content_type = "application/json"
-            body = json.dumps({"status": "broken"}).encode()
+            body = json.dumps({"status": "healthy"}).encode()
 
         elif self.path == "/":
             status = 200
