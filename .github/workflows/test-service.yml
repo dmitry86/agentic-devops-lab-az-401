@@ -26,11 +26,28 @@ jobs:
 
       - name: Run HTTP tests
         run: python -m unittest -v test_app
+
+      - name: Package application
+        run: zip status-service.zip app.py
+      - name: Save application artifact
+        uses: actions/upload-artifact@v7
+        with:
+          name: status-service
+          path: status-service.zip
+          if-no-files-found: error
+          retention-days: 3
   deploy:
     needs: test
     environment: training-production
     runs-on: ubuntu-latest
 
     steps:
+      - name: Download application artifact
+        uses: actions/download-artifact@v8
+        with:
+          name: status-service
+
+      - name: Check package contents
+        run: unzip -l status-service.zip
       - name: Simulate deployment
         run: echo "Tests passed. Ready to deploy."
