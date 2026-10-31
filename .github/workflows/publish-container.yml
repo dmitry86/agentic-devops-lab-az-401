@@ -47,4 +47,4 @@ jobs:
           subscription-id: 9198ecec-8541-47b2-ae85-59a1ebfe5517
 
       - name: Update Container App image
-        run: az containerapp update --resource-group rg-cloudops-status-lab --name cloudops-status --image ghcr.io/dmitry86/cloudops-status:${{ github.sha }} --subscription 9198ecec-8541-47b2-ae85-59a1ebfe5517
+        run: az containerapp update --resource-group rg-cloudops-status-lab --name cloudops-status --image ghcr.io/dmitry86/cloudops-status:${{ github.sha }} --set-env-vars APP_VERSION=${{ github.sha }} --subscription 9198ecec-8541-47b2-ae85-59a1ebfe5517

@@ -28,9 +28,25 @@ class StatusServiceTests(unittest.TestCase):
         cls.thread.join()
 
     def test_homepage(self):
-        with urlopen(self.base_url + "/", timeout=5) as response:
-            self.assertEqual(response.status, 200)
-            self.assertIn(b"CloudOps Status Service", response.read())
+        with patch.dict(os.environ, {}, clear=True):
+            with urlopen(self.base_url + "/", timeout=5) as response:
+                self.assertEqual(response.status, 200)
+                page = response.read()
+
+        self.assertIn(b"<title>CloudOps Status</title>", page)
+        self.assertIn(b"<h1>CloudOps Status</h1>", page)
+        self.assertIn(b"Learning lab", page)
+        self.assertIn(b"development", page)
+        self.assertIn(b'fetch("/ready"', page)
+        self.assertIn(b'readiness.status === "not_ready"', page)
+        self.assertIn(b"window.setInterval(updateReadiness, 30000)", page)
+
+    def test_homepage_uses_app_version(self):
+        with patch.dict(os.environ, {"APP_VERSION": "release-42"}):
+            with urlopen(self.base_url + "/", timeout=5) as response:
+                page = response.read()
+
+        self.assertIn(b"release-42", page)
 
     def test_health(self):
         with urlopen(self.base_url + "/health", timeout=5) as response:
