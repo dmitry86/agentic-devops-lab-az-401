@@ -28,3 +28,23 @@ jobs:
 
       - name: Push container image
         run: docker push ghcr.io/dmitry86/cloudops-status:${{ github.sha }}
+
+  deploy:
+    needs: publish
+    runs-on: ubuntu-latest
+    environment: training-production
+    permissions:
+      contents: read
+      id-token: write
+    timeout-minutes: 10
+
+    steps:
+      - name: Log in to Azure
+        uses: azure/login@v3
+        with:
+          client-id: f7f9be44-24eb-4240-8e6d-24a929d8b7ed
+          tenant-id: e5ac86ef-c732-4b85-b89f-0d63d50a811a
+          subscription-id: 9198ecec-8541-47b2-ae85-59a1ebfe5517
+
+      - name: Update Container App image
+        run: az containerapp update --resource-group rg-cloudops-status-lab --name cloudops-status --image ghcr.io/dmitry86/cloudops-status:${{ github.sha }} --subscription 9198ecec-8541-47b2-ae85-59a1ebfe5517
