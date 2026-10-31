@@ -1,5 +1,6 @@
-from http.server import BaseHTTPRequestHandler, HTTPServer
+from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 import json
+import os
 
 
 class StatusService(BaseHTTPRequestHandler):
@@ -8,6 +9,15 @@ class StatusService(BaseHTTPRequestHandler):
             status = 200
             content_type = "application/json"
             body = json.dumps({"status": "healthy"}).encode()
+
+        elif self.path == "/ready":
+            if os.environ.get("MAINTENANCE_MODE") == "true":
+                status = 503
+                body = json.dumps({"status": "not_ready"}).encode()
+            else:
+                status = 200
+                body = json.dumps({"status": "ready"}).encode()
+            content_type = "application/json"
 
         elif self.path == "/":
             status = 200
@@ -31,6 +41,6 @@ class StatusService(BaseHTTPRequestHandler):
 
 
 if __name__ == "__main__":
-    server = HTTPServer(("127.0.0.1", 8080), StatusService)
+    server = ThreadingHTTPServer(("0.0.0.0", 8080), StatusService)
     print("Open http://localhost:8080")
     server.serve_forever()
